@@ -29,7 +29,10 @@ export function buildPrompt(mensaje: MensajeUsuario): PromptArmado {
   };
 }
 
+// Escapes instead of stripping the tag: no variant of it can survive, so the
+// user cannot close the block. `&` goes first so "&lt;" typed by the user
+// stays literal text and is not read as a "<".
 function delimit(mensaje: MensajeUsuario): string {
-  const dato = mensaje.replaceAll(/<\/?mensaje_usuario>/gi, "");
+  const dato = mensaje.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   return `<${BLOCK}>\n${dato}\n</${BLOCK}>`;
 }
