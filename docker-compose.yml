@@ -1,18 +1,20 @@
+name: extractor
+
 services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: applica
-      POSTGRES_PASSWORD: applica
-      POSTGRES_DB: applica
-      APP_DB_PASSWORD: applica_app
+      POSTGRES_USER: extractor
+      POSTGRES_PASSWORD: extractor
+      POSTGRES_DB: extractor
+      APP_DB_PASSWORD: extractor_app
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./docker/postgres/init.sh:/docker-entrypoint-initdb.d/01-app-role.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U applica -d applica"]
+      test: ["CMD-SHELL", "pg_isready -U extractor -d extractor"]
       interval: 2s
       timeout: 5s
       retries: 30
@@ -22,9 +24,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgres://applica_app:applica_app@postgres:5432/applica
-      DATABASE_MIGRATION_URL: postgres://applica:applica@postgres:5432/applica
-      DEMO_EMAIL: ${DEMO_EMAIL:-demo@applica.local}
+      DATABASE_URL: postgres://extractor_app:extractor_app@postgres:5432/extractor
+      DATABASE_MIGRATION_URL: postgres://extractor:extractor@postgres:5432/extractor
+      DEMO_EMAIL: ${DEMO_EMAIL:-demo@extractor.local}
       DEMO_PASSWORD: ${DEMO_PASSWORD:-demo-pass-123}
       AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET in .env}
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}

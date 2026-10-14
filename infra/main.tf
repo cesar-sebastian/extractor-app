@@ -46,43 +46,43 @@ variable "image" {
 # Values are loaded outside git. This file only names the secrets.
 
 resource "aws_secretsmanager_secret" "anthropic_api_key" {
-  name        = "applica/anthropic-api-key"
+  name        = "extractor/anthropic-api-key"
   description = "Anthropic API key. The value is not in this file."
 }
 
 resource "aws_secretsmanager_secret" "database_url" {
-  name        = "applica/database-url"
-  description = "postgres URL for applica_app. Includes the password. Not in this file."
+  name        = "extractor/database-url"
+  description = "postgres URL for extractor_app. Includes the password. Not in this file."
 }
 
 resource "aws_secretsmanager_secret" "database_migration_url" {
-  name        = "applica/database-migration-url"
+  name        = "extractor/database-migration-url"
   description = "postgres URL for the migration role. Not in this file."
 }
 
 resource "aws_secretsmanager_secret" "auth_secret" {
-  name        = "applica/auth-secret"
+  name        = "extractor/auth-secret"
   description = "JWT signing secret. Not in this file."
 }
 
 resource "aws_ecs_cluster" "app" {
-  name = "applica"
+  name = "extractor"
 }
 
 # 14 days of operational logs. The 30-day wipe of message text is a script
 # against Postgres, not this file.
 resource "aws_cloudwatch_log_group" "app" {
-  name              = "/applica/app"
+  name              = "/extractor/app"
   retention_in_days = 14
 }
 
 resource "aws_iam_role" "execution" {
-  name               = "applica-execution"
+  name               = "extractor-execution"
   assume_role_policy = data.aws_iam_policy_document.ecs_assume.json
 }
 
 resource "aws_iam_role" "task" {
-  name               = "applica-task"
+  name               = "extractor-task"
   assume_role_policy = data.aws_iam_policy_document.ecs_assume.json
 }
 
@@ -122,7 +122,7 @@ resource "aws_iam_role_policy" "read_secrets" {
 }
 
 resource "aws_security_group" "app" {
-  name        = "applica-app"
+  name        = "extractor-app"
   description = "Fargate task. No inbound rule: this file has no load balancer."
   vpc_id      = var.vpc_id
 
@@ -135,7 +135,7 @@ resource "aws_security_group" "app" {
 }
 
 resource "aws_security_group" "db" {
-  name        = "applica-db"
+  name        = "extractor-db"
   description = "Postgres accepts the task only."
   vpc_id      = var.vpc_id
 
@@ -148,18 +148,18 @@ resource "aws_security_group" "db" {
 }
 
 resource "aws_db_subnet_group" "app" {
-  name       = "applica"
+  name       = "extractor"
   subnet_ids = var.private_subnet_ids
 }
 
 resource "aws_db_instance" "app" {
-  identifier        = "applica"
+  identifier        = "extractor"
   engine            = "postgres"
   engine_version    = "16"
   instance_class    = "db.t4g.micro"
   allocated_storage = 20
-  db_name           = "applica"
-  username          = "applica"
+  db_name           = "extractor"
+  username          = "extractor"
 
   # AWS stores the master password in Secrets Manager. It is not an argument here.
   manage_master_user_password = true
@@ -173,7 +173,7 @@ resource "aws_db_instance" "app" {
 }
 
 resource "aws_ecs_task_definition" "app" {
-  family                   = "applica"
+  family                   = "extractor"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = "256"
@@ -214,7 +214,7 @@ resource "aws_ecs_task_definition" "app" {
 }
 
 resource "aws_ecs_service" "app" {
-  name            = "applica"
+  name            = "extractor"
   cluster         = aws_ecs_cluster.app.id
   task_definition = aws_ecs_task_definition.app.arn
   desired_count   = 1
