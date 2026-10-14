@@ -1,0 +1,107 @@
+:root {
+  color: #1c1917;
+  background: #fafaf9;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+}
+
+body {
+  margin: 0;
+}
+
+.page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.stack {
+  display: grid;
+  gap: 0.75rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #d6d3d1;
+  border-radius: 0.4rem;
+  background: white;
+}
+
+button {
+  width: fit-content;
+  padding: 0.5rem 0.9rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: #1c1917;
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.error {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.4rem;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.empty,
+.note {
+  color: #57534e;
+}
+
+.fields {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.fields dt {
+  font-size: 0.85rem;
+  color: #57534e;
+}
+
+.fields dd {
+  margin: 0.15rem 0 0;
+}
+
+.confianza-baja {
+  color: #9a3412;
+}
+
+.confianza-media {
+  color: #854d0e;
+}
+
+.confianza-alta {
+  color: #166534;
+}
+
+.list {
+  padding-left: 1.1rem;
+}

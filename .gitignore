@@ -1,0 +1,8 @@
+node_modules
+.next
+.env
+*.tsbuildinfo
+
+# Guión de entrevista. No entra al repo que se entrega.
+DECISIONES.md
+ENTREVISTA.md
