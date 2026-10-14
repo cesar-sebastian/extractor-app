@@ -1,3 +1,4 @@
+import { AclaracionForm } from "@/components/aclaracion-form";
 import type { ExtraccionDetalle } from "@/lib/db/extracciones";
 
 export function ExtraccionDetail({ extraccion }: { extraccion: ExtraccionDetalle }) {
@@ -5,11 +6,19 @@ export function ExtraccionDetail({ extraccion }: { extraccion: ExtraccionDetalle
 
   return (
     <article className="stack">
+      {extraccion.parentId ? (
+        <p>
+          <a href={`/extracciones/${extraccion.parentId}`}>Mensaje anterior</a>
+        </p>
+      ) : null}
       <p>Estado: {extraccion.estado}</p>
       <h2>Mensaje</h2>
       <p>{extraccion.textoEntrada ?? "El texto ya no está guardado."}</p>
       {extraccion.estado === "fallida" ? (
         <p className="error">{extraccion.errorSchema ?? "No se pudo estructurar la respuesta."}</p>
+      ) : null}
+      {salida?.confianza === "baja" ? (
+        <p className="error">Confianza baja. Esto no está verificado. Comparalo con el mensaje.</p>
       ) : null}
       {salida ? (
         <dl className="fields">
@@ -51,6 +60,7 @@ export function ExtraccionDetail({ extraccion }: { extraccion: ExtraccionDetalle
         {extraccion.promptVersion} · {extraccion.modelId} · {extraccion.tokensEntrada} tokens de
         entrada · {extraccion.tokensSalida} de salida · {extraccion.duracionMs} ms
       </p>
+      {extraccion.textoEntrada ? <AclaracionForm extraccionId={extraccion.id} /> : null}
     </article>
   );
 }

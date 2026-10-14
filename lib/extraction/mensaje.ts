@@ -9,3 +9,13 @@ export const mensajeUsuarioSchema = z
   .brand("MensajeUsuario");
 
 export type MensajeUsuario = z.infer<typeof mensajeUsuarioSchema>;
+
+export function prepararMensaje(
+  texto: unknown,
+): { ok: true; mensaje: MensajeUsuario } | { ok: false; error: "invalid_body" } {
+  const parsed = mensajeUsuarioSchema.safeParse(texto);
+  if (!parsed.success) {
+    return { ok: false, error: "invalid_body" };
+  }
+  return { ok: true, mensaje: parsed.data };
+}

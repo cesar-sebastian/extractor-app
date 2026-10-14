@@ -10,10 +10,11 @@ async function seed(): Promise<void> {
   const { db, close } = openDatabase(config.databaseUrl);
 
   try {
+    const email = config.demoEmail.toLowerCase();
     const existing = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.email, config.demoEmail))
+      .where(eq(users.email, email))
       .limit(1);
 
     const alreadyThere = existing[0];
@@ -25,7 +26,7 @@ async function seed(): Promise<void> {
     const inserted = await db
       .insert(users)
       .values({
-        email: config.demoEmail,
+        email,
         passwordHash: await hashPassword(config.demoPassword),
       })
       .returning({ id: users.id });

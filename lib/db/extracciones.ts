@@ -35,6 +35,7 @@ export async function insertExtraccion(input: {
   tokensEntrada: number;
   tokensSalida: number;
   duracionMs: number;
+  parentId?: ExtraccionId;
 }): Promise<ExtraccionId> {
   const rows = await getDatabase()
     .insert(extracciones)
