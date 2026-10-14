@@ -2,11 +2,12 @@
 
 import { useState, type FormEvent } from "react";
 
-type LoginError = "invalid_body" | "invalid_credentials" | "network";
+type LoginError = "invalid_body" | "invalid_credentials" | "too_many_attempts" | "network";
 
 const messages: Record<LoginError, string> = {
   invalid_body: "Completá el email y la contraseña.",
   invalid_credentials: "Email o contraseña incorrectos.",
+  too_many_attempts: "Demasiados intentos con este email. Probá de nuevo en 15 minutos.",
   network: "No se pudo entrar. El texto queda en el formulario.",
 };
 
@@ -39,7 +40,9 @@ export function LoginForm() {
         payload &&
         typeof payload === "object" &&
         "error" in payload &&
-        (payload.error === "invalid_body" || payload.error === "invalid_credentials")
+        (payload.error === "invalid_body" ||
+          payload.error === "invalid_credentials" ||
+          payload.error === "too_many_attempts")
       ) {
         setError(payload.error);
         return;

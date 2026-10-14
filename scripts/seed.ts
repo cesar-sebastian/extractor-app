@@ -26,7 +26,7 @@ async function seed(): Promise<void> {
       .insert(users)
       .values({
         email: config.demoEmail,
-        passwordHash: hashPassword(config.demoPassword),
+        passwordHash: await hashPassword(config.demoPassword),
       })
       .returning({ id: users.id });
 

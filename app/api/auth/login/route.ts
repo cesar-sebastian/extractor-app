@@ -15,7 +15,8 @@ export async function POST(request: Request): Promise<Response> {
 
   const result = await login(parsed.data.email, parsed.data.password);
   if (!result.ok) {
-    return Response.json({ error: result.error }, { status: 401 });
+    const status = result.error === "too_many_attempts" ? 429 : 401;
+    return Response.json({ error: result.error }, { status });
   }
 
   return Response.json({ ok: true });
