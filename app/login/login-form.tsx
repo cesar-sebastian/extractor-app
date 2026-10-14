@@ -5,10 +5,10 @@ import { useState, type FormEvent } from "react";
 type LoginError = "invalid_body" | "invalid_credentials" | "too_many_attempts" | "network";
 
 const messages: Record<LoginError, string> = {
-  invalid_body: "Completá el email y la contraseña.",
-  invalid_credentials: "Email o contraseña incorrectos.",
-  too_many_attempts: "Demasiados intentos con este email. Probá de nuevo en 15 minutos.",
-  network: "No se pudo entrar. El texto queda en el formulario.",
+  invalid_body: "Enter the email and the password.",
+  invalid_credentials: "Wrong email or password.",
+  too_many_attempts: "Too many attempts for this email. Try again in 15 minutes.",
+  network: "Could not sign in. The text stays in the form.",
 };
 
 export function LoginForm() {
@@ -63,12 +63,12 @@ export function LoginForm() {
         <input name="email" type="email" autoComplete="username" required />
       </label>
       <label>
-        Contraseña
+        Password
         <input name="password" type="password" autoComplete="current-password" required />
       </label>
       {error ? <p className="error">{messages[error]}</p> : null}
       <button type="submit" disabled={pending}>
-        {pending ? "Entrando…" : "Entrar"}
+        {pending ? "Signing in…" : "Sign in"}
       </button>
     </form>
   );

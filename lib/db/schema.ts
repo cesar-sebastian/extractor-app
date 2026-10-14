@@ -1,8 +1,8 @@
 import { type AnyPgColumn, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import type { Extraccion } from "../extraction/extraccion";
-import type { ExtraccionId, UserId } from "../ids";
+import type { Extraction } from "../extraction/extraction";
+import type { ExtractionId, UserId } from "../ids";
 
-export const estadoExtraccion = pgEnum("estado_extraccion", ["completada", "fallida"]);
+export const extractionStatus = pgEnum("extraction_status", ["completed", "failed"]);
 
 export const users = pgTable("users", {
   id: uuid("id").$type<UserId>().primaryKey().defaultRandom(),
@@ -11,28 +11,28 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const extracciones = pgTable(
-  "extracciones",
+export const extractions = pgTable(
+  "extractions",
   {
-    id: uuid("id").$type<ExtraccionId>().primaryKey().defaultRandom(),
+    id: uuid("id").$type<ExtractionId>().primaryKey().defaultRandom(),
     userId: uuid("user_id")
       .$type<UserId>()
       .notNull()
       .references(() => users.id, { onDelete: "restrict" }),
     parentId: uuid("parent_id")
-      .$type<ExtraccionId | null>()
-      .references((): AnyPgColumn => extracciones.id, { onDelete: "restrict" }),
+      .$type<ExtractionId | null>()
+      .references((): AnyPgColumn => extractions.id, { onDelete: "restrict" }),
     // Null after the 30-day retention wipe. A new row must still send the text.
-    textoEntrada: text("texto_entrada"),
-    salida: jsonb("salida").$type<Extraccion | null>(),
-    estado: estadoExtraccion("estado").notNull(),
+    inputText: text("input_text"),
+    output: jsonb("output").$type<Extraction | null>(),
+    status: extractionStatus("status").notNull(),
     errorSchema: text("error_schema"),
     promptVersion: text("prompt_version").notNull(),
     modelId: text("model_id").notNull(),
-    tokensEntrada: integer("tokens_entrada").notNull(),
-    tokensSalida: integer("tokens_salida").notNull(),
-    duracionMs: integer("duracion_ms").notNull(),
+    inputTokens: integer("input_tokens").notNull(),
+    outputTokens: integer("output_tokens").notNull(),
+    durationMs: integer("duration_ms").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("extracciones_user_id_created_at_idx").on(table.userId, table.createdAt)],
+  (table) => [index("extractions_user_id_created_at_idx").on(table.userId, table.createdAt)],
 );

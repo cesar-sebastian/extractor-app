@@ -1,16 +1,14 @@
-import { extraccionSchema, type Extraccion } from "./extraccion";
+import { extractionSchema, type Extraction } from "./extraction";
 
-export type ExtraccionParseada =
-  | { ok: true; extraccion: Extraccion }
+export type ParsedExtraction =
+  | { ok: true; extraction: Extraction }
   | { ok: false; errorSchema: string };
 
-export function toExtraction(objeto: unknown): ExtraccionParseada {
-  const parsed = extraccionSchema.safeParse(objeto);
+export function toExtraction(value: unknown): ParsedExtraction {
+  const parsed = extractionSchema.safeParse(value);
   if (!parsed.success) {
-    const fields = parsed.error.issues
-      .map((issue) => issue.path.join(".") || "objeto")
-      .join(", ");
+    const fields = parsed.error.issues.map((issue) => issue.path.join(".") || "object").join(", ");
     return { ok: false, errorSchema: `schema: ${fields}` };
   }
-  return { ok: true, extraccion: parsed.data };
+  return { ok: true, extraction: parsed.data };
 }

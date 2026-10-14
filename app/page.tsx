@@ -1,11 +1,11 @@
 import { ExtractionDraftForm } from "@/components/extraction-draft-form";
 import { LogoutForm } from "@/components/logout-form";
 import { requireUser } from "@/lib/auth/current-user";
-import { listExtracciones } from "@/lib/db/extracciones";
+import { listExtractions } from "@/lib/db/extractions";
 
 export default async function HomePage() {
   const user = await requireUser();
-  const items = await listExtracciones(user.id);
+  const items = await listExtractions(user.id);
 
   return (
     <main className="page">
@@ -18,15 +18,15 @@ export default async function HomePage() {
       </header>
       <ExtractionDraftForm />
       <section className="stack">
-        <h2>Extracciones</h2>
+        <h2>Extractions</h2>
         {items.length === 0 ? (
-          <p className="empty">Todavía no hay extracciones.</p>
+          <p className="empty">No extractions yet.</p>
         ) : (
           <ul className="list">
             {items.map((item) => (
               <li key={item.id}>
-                <a href={`/extracciones/${item.id}`}>
-                  {item.createdAt.toLocaleString("es")} · {item.estado}
+                <a href={`/extractions/${item.id}`}>
+                  {item.createdAt.toLocaleString("en")} · {item.status}
                 </a>
               </li>
             ))}

@@ -2,32 +2,32 @@
 
 import { useState, type FormEvent } from "react";
 
-type FormError = "invalid_body" | "rate_limit" | "timeout" | "provider" | "sin_texto" | "network";
+type FormError = "invalid_body" | "rate_limit" | "timeout" | "provider" | "missing_text" | "network";
 
 const messages: Record<FormError, string> = {
-  invalid_body: "La aclaración tiene que entrar, junto con el mensaje, en 4000 caracteres.",
-  rate_limit: "Llegaste a 10 extracciones en esta hora.",
-  timeout: "El modelo no respondió a tiempo. La aclaración sigue en el formulario.",
-  provider: "El modelo no respondió. La aclaración sigue en el formulario.",
-  sin_texto: "El mensaje original ya no está guardado, así que no se puede aclarar.",
-  network: "No se pudo enviar. La aclaración sigue en el formulario.",
+  invalid_body: "The clarification, together with the message, has to fit in 4000 characters.",
+  rate_limit: "You reached 10 extractions this hour.",
+  timeout: "The model did not answer in time. The clarification is still in the form.",
+  provider: "The model did not answer. The clarification is still in the form.",
+  missing_text: "The original message is no longer stored, so it cannot be clarified.",
+  network: "Could not send. The clarification is still in the form.",
 };
 
-export function AclaracionForm({ extraccionId }: { extraccionId: string }) {
+export function ClarificationForm({ extractionId }: { extractionId: string }) {
   const [error, setError] = useState<FormError | null>(null);
   const [pending, setPending] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const text = new FormData(event.currentTarget).get("texto");
+    const text = new FormData(event.currentTarget).get("text");
     setPending(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/extracciones/${extraccionId}/aclaraciones`, {
+      const response = await fetch(`/api/extractions/${extractionId}/clarifications`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ texto: text }),
+        body: JSON.stringify({ text }),
       });
 
       if (response.status === 401) {
@@ -37,7 +37,7 @@ export function AclaracionForm({ extraccionId }: { extraccionId: string }) {
 
       const payload: unknown = await response.json().catch(() => null);
       if (response.ok && isCreated(payload)) {
-        window.location.assign(`/extracciones/${payload.id}`);
+        window.location.assign(`/extractions/${payload.id}`);
         return;
       }
 
@@ -51,14 +51,14 @@ export function AclaracionForm({ extraccionId }: { extraccionId: string }) {
 
   return (
     <form className="stack" onSubmit={onSubmit}>
-      <h2>Aclaración</h2>
+      <h2>Clarification</h2>
       <label>
-        Sumá un dato que el mensaje no decía
-        <textarea name="texto" rows={3} disabled={pending} />
+        Add a fact the message did not state
+        <textarea name="text" rows={3} disabled={pending} />
       </label>
       {error ? <p className="error">{messages[error]}</p> : null}
       <button type="submit" disabled={pending}>
-        {pending ? "Aclarando…" : "Aclarar"}
+        {pending ? "Clarifying…" : "Clarify"}
       </button>
     </form>
   );
@@ -81,7 +81,7 @@ function formError(payload: unknown, status: number): FormError {
     code === "rate_limit" ||
     code === "timeout" ||
     code === "provider" ||
-    code === "sin_texto"
+    code === "missing_text"
   ) {
     return code;
   }
@@ -92,7 +92,7 @@ function formError(payload: unknown, status: number): FormError {
     return "timeout";
   }
   if (status === 409) {
-    return "sin_texto";
+    return "missing_text";
   }
   if (status === 400) {
     return "invalid_body";

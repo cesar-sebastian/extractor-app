@@ -90,15 +90,15 @@ button:disabled {
   margin: 0.15rem 0 0;
 }
 
-.confianza-baja {
+.confidence-low {
   color: #9a3412;
 }
 
-.confianza-media {
+.confidence-medium {
   color: #854d0e;
 }
 
-.confianza-alta {
+.confidence-high {
   color: #166534;
 }
 

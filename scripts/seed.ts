@@ -19,7 +19,7 @@ async function seed(): Promise<void> {
 
     const alreadyThere = existing[0];
     if (alreadyThere) {
-      console.log(`seed: el usuario demo ya existe (${alreadyThere.id})`);
+      console.log(`seed: demo user already exists (${alreadyThere.id})`);
       return;
     }
 
@@ -33,10 +33,10 @@ async function seed(): Promise<void> {
 
     const created = inserted[0];
     if (!created) {
-      throw new Error("seed: la base no devolvió el usuario insertado");
+      throw new Error("seed: the database did not return the inserted user");
     }
 
-    console.log(`seed: usuario demo creado (${created.id})`);
+    console.log(`seed: demo user created (${created.id})`);
   } finally {
     await close();
   }

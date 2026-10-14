@@ -1,8 +1,8 @@
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { crearExtraccion } from "@/lib/extraction/crear-extraccion";
-import { prepararMensaje } from "@/lib/extraction/mensaje";
-import { tomarCupo } from "@/lib/extraction/rate-limit";
-import { readJson, textoDelBody } from "@/lib/http/read-json";
+import { createExtraction } from "@/lib/extraction/create-extraction";
+import { prepareMessage } from "@/lib/extraction/message";
+import { takeSlot } from "@/lib/extraction/rate-limit";
+import { readJson, textFromBody } from "@/lib/http/read-json";
 
 export async function POST(request: Request): Promise<Response> {
   const user = await getCurrentUser();
@@ -15,16 +15,16 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: "invalid_body" }, { status: 400 });
   }
 
-  const parsed = prepararMensaje(textoDelBody(body.value));
+  const parsed = prepareMessage(textFromBody(body.value));
   if (!parsed.ok) {
     return Response.json({ error: parsed.error }, { status: 400 });
   }
 
-  if (!tomarCupo(user.id)) {
+  if (!takeSlot(user.id)) {
     return Response.json({ error: "rate_limit" }, { status: 429 });
   }
 
-  const result = await crearExtraccion(user.id, parsed.mensaje);
+  const result = await createExtraction(user.id, parsed.message);
   if (!result.ok) {
     const status = result.error === "timeout" ? 504 : 502;
     return Response.json({ error: result.error }, { status });

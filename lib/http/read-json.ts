@@ -20,9 +20,9 @@ export async function readJson(
   }
 }
 
-export function textoDelBody(value: unknown): unknown {
-  if (value && typeof value === "object" && "texto" in value) {
-    return value.texto;
+export function textFromBody(value: unknown): unknown {
+  if (value && typeof value === "object" && "text" in value) {
+    return value.text;
   }
   return undefined;
 }

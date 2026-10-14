@@ -4,37 +4,37 @@ const level = process.env.LOG_LEVEL?.trim() || "info";
 
 const logger = pino({ level });
 
-export type EstadoLlamada = "completada" | "fallida" | "timeout" | "provider";
+export type CallStatus = "completed" | "failed" | "timeout" | "provider";
 
 // The only shape a model call is allowed to log. The message and the summary
 // are not fields here, so they cannot be written by accident.
-export type LogLlamada = {
+export type CallLog = {
   userId: string;
   extractionId: string | null;
   promptVersion: string;
   modelId: string;
-  tokensEntrada: number;
-  tokensSalida: number;
-  duracionMs: number;
-  status: EstadoLlamada;
+  inputTokens: number;
+  outputTokens: number;
+  durationMs: number;
+  status: CallStatus;
 };
 
-export function logLlamada(event: LogLlamada): void {
+export function logCall(event: CallLog): void {
   logger.info(
     {
       userId: event.userId,
       extractionId: event.extractionId,
       promptVersion: event.promptVersion,
       modelId: event.modelId,
-      tokensEntrada: event.tokensEntrada,
-      tokensSalida: event.tokensSalida,
-      duracionMs: event.duracionMs,
+      inputTokens: event.inputTokens,
+      outputTokens: event.outputTokens,
+      durationMs: event.durationMs,
       status: event.status,
     },
-    "extraccion",
+    "extraction",
   );
 }
 
-export function logRetencion(borradas: number, retencionDias: number): void {
-  logger.info({ borradas, retencionDias }, "retencion");
+export function logRetention(wiped: number, retentionDays: number): void {
+  logger.info({ wiped, retentionDays }, "retention");
 }

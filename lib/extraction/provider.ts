@@ -1,13 +1,13 @@
-import type { PromptArmado } from "./build-prompt";
+import type { BuiltPrompt } from "./build-prompt";
 
-export type InvocacionExitosa = {
+export type SuccessfulInvocation = {
   modelId: string;
-  tokensEntrada: number;
-  tokensSalida: number;
-  objeto: unknown;
+  inputTokens: number;
+  outputTokens: number;
+  value: unknown;
 };
 
 export interface ModelProvider {
   readonly id: string;
-  invoke(prompt: PromptArmado, signal: AbortSignal): Promise<InvocacionExitosa>;
+  invoke(prompt: BuiltPrompt, signal: AbortSignal): Promise<SuccessfulInvocation>;
 }

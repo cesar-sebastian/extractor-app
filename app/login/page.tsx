@@ -11,7 +11,7 @@ export default async function LoginPage() {
   return (
     <main className="page">
       <h1>Extractor</h1>
-      <p>Entrá con el usuario demo.</p>
+      <p>Sign in with the demo user.</p>
       <LoginForm />
     </main>
   );

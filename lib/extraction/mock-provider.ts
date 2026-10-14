@@ -1,29 +1,29 @@
-import type { PromptArmado } from "./build-prompt";
-import type { InvocacionExitosa, ModelProvider } from "./provider";
+import type { BuiltPrompt } from "./build-prompt";
+import type { ModelProvider, SuccessfulInvocation } from "./provider";
 
-// Whole word on both ends: "orden 1234" or "reorden 123" must not match,
+// Whole word on both ends: "order 1234" or "reorder 123" must not match,
 // or the mock would report an order number the text does not contain.
-const ORDEN_FIJA = /\borden\s+123\b/i;
+const FIXED_ORDER = /\border\s+123\b/i;
 
 export class MockProvider implements ModelProvider {
   readonly id = "mock";
 
-  invoke(prompt: PromptArmado): Promise<InvocacionExitosa> {
-    const tieneOrden = ORDEN_FIJA.test(prompt.prompt);
+  invoke(prompt: BuiltPrompt): Promise<SuccessfulInvocation> {
+    const hasOrder = FIXED_ORDER.test(prompt.prompt);
     return Promise.resolve({
       modelId: this.id,
-      tokensEntrada: 0,
-      tokensSalida: 0,
-      objeto: {
-        resumen: tieneOrden
-          ? "El cliente consulta por la orden 123."
-          : "El cliente escribió un mensaje de soporte.",
-        categoria: tieneOrden ? "envio" : "otro",
-        urgencia: "media",
-        pedido: tieneOrden ? "Revisar la orden 123" : null,
-        numeroDeOrden: tieneOrden ? "123" : null,
-        confianza: tieneOrden ? "alta" : "baja",
-        incertidumbres: tieneOrden ? [] : ["No aparece un número de orden en el mensaje"],
+      inputTokens: 0,
+      outputTokens: 0,
+      value: {
+        summary: hasOrder
+          ? "The customer is asking about order 123."
+          : "The customer wrote a support message.",
+        category: hasOrder ? "shipping" : "other",
+        urgency: "medium",
+        request: hasOrder ? "Review order 123" : null,
+        orderNumber: hasOrder ? "123" : null,
+        confidence: hasOrder ? "high" : "low",
+        uncertainties: hasOrder ? [] : ["No order number appears in the message"],
       },
     });
   }

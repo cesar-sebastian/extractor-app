@@ -192,7 +192,7 @@ resource "aws_ecs_task_definition" "app" {
       environment = [
         { name = "LLM_MODEL", value = "claude-haiku-5-5" },
         { name = "LLM_PROVIDER", value = "anthropic" },
-        { name = "PROMPT_VERSION", value = "extract-v3" },
+        { name = "PROMPT_VERSION", value = "extract-v4" },
         { name = "NODE_ENV", value = "production" },
       ]
       secrets = [

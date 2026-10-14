@@ -9,7 +9,7 @@ const postgresUrlSchema = z.string().refine(
       return false;
     }
   },
-  { message: "debe ser una URL postgres://" },
+  { message: "must be a postgres:// URL" },
 );
 
 const envSchema = z.object({
@@ -47,13 +47,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     const fields = parsed.error.issues
       .map((issue) => issue.path.join("."))
       .join(", ");
-    throw new Error(`Configuración inválida: ${fields}`);
+    throw new Error(`Invalid configuration: ${fields}`);
   }
 
   const anthropicApiKey = parsed.data.ANTHROPIC_API_KEY ?? null;
   const llmProvider = parsed.data.LLM_PROVIDER ?? (anthropicApiKey ? "anthropic" : "mock");
   if (llmProvider === "anthropic" && !anthropicApiKey) {
-    throw new Error("Configuración inválida: ANTHROPIC_API_KEY");
+    throw new Error("Invalid configuration: ANTHROPIC_API_KEY");
   }
 
   return {

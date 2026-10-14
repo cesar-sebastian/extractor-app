@@ -47,9 +47,9 @@ npm run dev
 
 Only then is a row inserted. The handler does not talk to the model itself.
 
-`MockProvider` and `AnthropicProvider` implement the same `ModelProvider` interface. `crearProveedor` picks one from the environment. The mock is a fixed answer, not a second extractor: it returns order `123` only when the prompt contains the whole phrase `orden 123`. Anything else is low confidence and nulls. That is what runs without a key, and what the fixtures assert.
+`MockProvider` and `AnthropicProvider` implement the same `ModelProvider` interface. `createProvider` picks one from the environment. The mock is a fixed answer, not a second extractor: it returns order `123` only when the prompt contains the whole phrase `order 123`. Anything else is low confidence and nulls. That is what runs without a key, and what the fixtures assert.
 
-A clarification is a second row. `POST /api/extracciones/:id/aclaraciones` loads the parent for the session user, sends the original text plus the clarification, and stores `parentId`. It does not edit the first JSON. The id in the URL is checked against the session. A missing row and another user's row are the same 404.
+A clarification is a second row. `POST /api/extractions/:id/clarifications` loads the parent for the session user, sends the original text plus the clarification, and stores `parentId`. It does not edit the first JSON. The id in the URL is checked against the session. A missing row and another user's row are the same 404. If the stored text was already wiped, the route returns 409 `missing_text` and does not call the model.
 
 Low confidence is an explicit sentence on the result, not only a color.
 
@@ -57,7 +57,7 @@ Low confidence is an explicit sentence on the result, not only a color.
 
 The output is a closed object because a free-form summary cannot be evaluated and cannot be refused field by field. Category, urgency, and confidence are enums. The order number has to appear in the text.
 
-The prompt version is `extract-v3`. The instruction text lives in `build-prompt.ts`. `PROMPT_VERSION` may be set in the environment; if it is absent, the row still stores `extract-v3`.
+The prompt version is `extract-v4`. The instruction text lives in `build-prompt.ts`, in English, and the object fields are `summary`, `category`, `urgency`, `request`, `orderNumber`, `confidence`, and `uncertainties`. `PROMPT_VERSION` may be set in the environment; if it is absent, the row still stores `extract-v4`.
 
 Haiku 5.5 (`claude-haiku-5-5`) does not accept temperature. The code does not send it. Stable fields come from the schema, not from sampling. The summary is prose and is allowed to move.
 
@@ -98,9 +98,9 @@ What is not stored: the API key, a plaintext password, or the raw model text whe
 
 Audit is the row itself. It answers who asked, which prompt version, which model, when, how many tokens, and, through `parentId`, whether this was a clarification of an earlier row. After the wipe, that record remains. The message does not.
 
-Each model call logs one JSON line to stdout: `userId`, `extractionId`, `promptVersion`, `modelId`, `tokensEntrada`, `tokensSalida`, `duracionMs`, `status`. The logger is not exported. The message and the summary are not fields of that object. If the provider times out, there is no row, `extractionId` is null, and the token counts are 0.
+Each model call logs one JSON line to stdout: `userId`, `extractionId`, `promptVersion`, `modelId`, `inputTokens`, `outputTokens`, `durationMs`, `status`. The logger is not exported. The message and the summary are not fields of that object. If the provider times out, there is no row, `extractionId` is null, and the token counts are 0.
 
-`npm run retain` nulls `texto_entrada` and `salida` on rows older than 30 days. The row stays: id, user, status, prompt version, model, tokens, duration, and time. `error_schema` stays too; it is the field name that failed, not the message. There is no AWS cron. On a VPS this would be the host cron, using the same `DATABASE_URL`.
+`npm run retain` nulls `input_text` and `output` on rows older than 30 days. The row stays: id, user, status, prompt version, model, tokens, duration, and time. `error_schema` stays too; it is the field name that failed, not the message. There is no AWS cron. On a VPS this would be the host cron, using the same `DATABASE_URL`.
 
 Queries always filter by the session user id. The body cannot choose whose rows to read.
 
@@ -132,7 +132,7 @@ The model call lasts seconds and holds a connection. A Lambda would fight the ti
 
 **Tools.** There is no order system to query. A tool that "looks up the order" would give the model a side effect. That is the thing a prompt injection must not be able to fire. The model has no tools.
 
-**Queues.** The person is looking at the screen, and the work fits inside the HTTP timeout. A queue is for a job that should not block the request. That would be a `pendiente` row in the Postgres that already exists, plus a worker. Kafka is a replicated log for many producers or several consumers. This app has one user and a short text. A broker would be another thing that can fail while the person is still waiting for the JSON.
+**Queues.** The person is looking at the screen, and the work fits inside the HTTP timeout. A queue is for a job that should not block the request. That would be a `pending` row in the Postgres that already exists, plus a worker. Kafka is a replicated log for many producers or several consumers. This app has one user and a short text. A broker would be another thing that can fail while the person is still waiting for the JSON.
 
 **RAG.** The message fits in the prompt. Retrieval is the next piece when a manual or a catalog does not fit in the window. A vector store here would not change the result.
 
