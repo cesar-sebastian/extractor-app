@@ -1,13 +1,15 @@
 import type { PromptArmado } from "./build-prompt";
 import type { InvocacionExitosa, ModelProvider } from "./provider";
 
-const ORDEN_FIJA = "orden 123";
+// Whole word on both ends: "orden 1234" or "reorden 123" must not match,
+// or the mock would report an order number the text does not contain.
+const ORDEN_FIJA = /\borden\s+123\b/i;
 
 export class MockProvider implements ModelProvider {
   readonly id = "mock";
 
   invoke(prompt: PromptArmado): Promise<InvocacionExitosa> {
-    const tieneOrden = prompt.prompt.toLowerCase().includes(ORDEN_FIJA);
+    const tieneOrden = ORDEN_FIJA.test(prompt.prompt);
     return Promise.resolve({
       modelId: this.id,
       tokensEntrada: 0,
