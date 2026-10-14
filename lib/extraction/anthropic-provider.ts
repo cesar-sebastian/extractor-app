@@ -17,7 +17,8 @@ export class AnthropicProvider implements ModelProvider {
         instructions: prompt.instructions,
         prompt: prompt.prompt,
         output: Output.object({ schema: extraccionSchema }),
-        temperature: 0,
+        // No temperature: claude-haiku-5-5 does not accept it, and the SDK only
+        // warns and drops it. Stable fields come from the closed schema.
         maxOutputTokens: MAX_OUTPUT_TOKENS,
         reasoning: "none",
         maxRetries: 1,
